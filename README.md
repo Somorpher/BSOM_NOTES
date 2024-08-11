@@ -134,3 +134,37 @@ This process continues for all blocks, to recover any plaintext block(except the
 *CBC* Encryption cannot happen in parallel because each block depends on the result of the previous block, but in decryption, it can process multiple ciphertext block in parallel since all ciphertext blocks are available at the same time.
 
 ### Cipher Feedback Mode(CFB)
+*CBF* mode encrypts plaintext using previous ciphertext segments to encrypt the next block of plaintext, it requires an Initialization Vector(IV) to start the process.
+The *IV* can also not be secret, but should be unpredictable.
+*CBF* Mode uses a parameter called s, which determines the size of the segmens(in bits) for both plaintext and ciphertext(e.g: 1-bit, 8-bit or 64-bit CFB Mode).
+
+** CFB Encryption**
+For encryption, the first input block is the *IV*. It applies the encryption function to the IV to get the first output block. The first ciphertext segment is created by XORing the first plaintext segment with the most significant bits of the output block, the remaining bits of the output block are discarded. For the next input blocks, like the second input block, it takes the least significant bits of the IV and combine them with the first ciphertext segment.
+This process continues, each new input block is formed by combining the previous ciphertext segment with the least significant bits of the previous input block. This process is repeated for all plaintext segments, using output from the previous step to create the next input block.
+
+** CFB Decryption**
+For decryption, the first input block is the *IV*, it applies the encryption function to the IV to get the output block. To recover the first plaintext segment, it XORes the most significant bits of the output block with the first ciphertext segment. For subsequent plaintext segments, it continues to use the previous ciphertext segments in the same way.
+In *CBF* enecryption, you cannot process multiple blocks in parallel because each block depends on the previous one.
+In *CBC* decryption, you can process multiple blocks in parallel once the input blocks are constructed from the IV and ciphertext.
+So...
+*CBF* Mode uses previous ciphertext to encrypt the next block of plaintext, making it more secure. The IV is crucial for starting the process, encryption cannot be parallel, decryption can.
+
+
+### Output Feedback Mode(OFB)
+
+the *OFB* Mode generates a series of output blocks from an initialization vector(IV) and uses these blocks to encrypt plaintext, it also works in reverse for decryption.
+*OFB* requires an *IV*, the IV must be unique for each encryption execution and not reused.
+ 
+ **OFB Encryption**
+For the first output block, it starts with the *IV* and appies the encryption function to create the first output block(O1).
+Then XORes the first output block(O1) with the first plaintext block(P1) to get the first ciphertext block(C1).
+For next output block(O2), it uses the previous output block (O1) as input to the encryption function, then it XORes the output with the second plaintext block(P2) to get the second ciphertext block(C2).
+This process is repeated for all plaintext blocks, using the previous output block to generate the next one.
+The Last block, if a partial block, only the most significant bits are used for the XOR operation, and the rest are discarder.
+
+** OFB Decryption **
+For the first output block, it starts with the *IV* and generate the first output block(O1), XOR the output with the first ciphertext block(C1) to recover the first plaintext block(P1).
+For subsequent output blocks, it uses the previous output block to generate the next output block(O2) and XOR it with the second ciphertext block(C2) to recover the second plaintext block(P2).
+For the Last block, it uses the most significant bits of the last output block for the XOR operation, and discard the rest.
+In both encryption and decryption, each output block depends on the previous one so cannot process multiple blocks in parallel, however if **IV** is known, it can generate the output blocks before it has the plaintext or ciphertext.
+It is recommended to use a unique IV for every message. If the same IV is used for all messages, an attacked who knows one plaintext block, can potentially recover corresponding blocks from other messages encrypted with the same IV.
