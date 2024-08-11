@@ -168,3 +168,34 @@ For subsequent output blocks, it uses the previous output block to generate the 
 For the Last block, it uses the most significant bits of the last output block for the XOR operation, and discard the rest.
 In both encryption and decryption, each output block depends on the previous one so cannot process multiple blocks in parallel, however if **IV** is known, it can generate the output blocks before it has the plaintext or ciphertext.
 It is recommended to use a unique IV for every message. If the same IV is used for all messages, an attacked who knows one plaintext block, can potentially recover corresponding blocks from other messages encrypted with the same IV.
+
+
+### Counter Mode(CTR)
+*CTR* Mode encrypts data with a series of unique input blocks called counters. These counter are processed to create output blocks, which are then combined with a plaintext to produce ciphertext.
+Each counter in the sequence must be different from all the others, not just within a single message, but across all messages encrypted with the same key, this ensures that the encryption remains secure.
+
+** CTR Encryption**
+For each counter(T1, T2, ..., Tn), it applies the encryption function to generate output blocks(O1, O2...).
+To generate ciphertext, it XORes each output block with the corresponding plaintext block to create the ciphertext blocks.
+For the last block, if it's a partial block, only the most significant bits are used for XOR operation, and the rest are discarded.
+
+** CTR Decryption**
+Like encryption, it applies encryption function to each counter to generate the output blocks.
+To recover plaintext, it XORes each output block with the corresponding ciphertext block to recover the plaintext blocks.
+For the last block, uses the most significat bits of the output block for the XOR operation, discarding the rest.
+In both encryption and decryption, the output blocks can be generated in parallel, allowing for processing multiple counters at the same time.
+It can also recover any plaintext block independently from others, as long as it has the corresponding counter.
+So... *CTR* Mode uses unique counters to generate output blocks that are XORed with plaintext to create ciphertext, it allowes for parallel processing, making it efficient, each counter must be unique across all messages to maintain security.
+
+
+### Padding 
+In encryption modes like *ECB*, *CBC*, and *CFB*, the plaintext must be a complete set of data blocks. This means that the total number of bits in the plaintext must be a multiple of the block size.
+If the plaintext doesn't meet this requirement, it needs to add extra bits to make it fit, this process is called *padding*.
+A common padding method is to add a single '1' bit to the end of the plaintext, followed by enough '0' bits to fill out the last block. 
+For example, if your plaintext ends with some bits and you need to complete a block, you would add a '1' bit and then add '0' bits until the block is full.
+The padding bits can be removed easily as long as the receiver knows that the message is padded.
+to Avoid confusion,it's a good idea for the sender to always pad messages, even if the last block is already complete, this way, the receiver can tell that padding exists.
+Instead of always padding, you could send messages without padding if there's a reliable way for the receiver to know whether padding is present, such as including a message length indicator.
+So... padding is necessary to ensure that plaintext fits into complete blocks for encryption. A comon method is to add '1' bit followed by '0' bits.
+
+### Generation of Counter Blocks
