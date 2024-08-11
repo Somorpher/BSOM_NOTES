@@ -199,3 +199,39 @@ Instead of always padding, you could send messages without padding if there's a 
 So... padding is necessary to ensure that plaintext fits into complete blocks for encryption. A comon method is to add '1' bit followed by '0' bits.
 
 ### Generation of Counter Blocks
+Each plaintext block encrypted with a given key must have a unique counter block, if the same counter block is used more than once, it can compromise the security of the encrypted data.
+If an attacker knows any plaintext block encrypted with a counter, they can find the output and recover other plaintexts encrypted with that same counter.
+To ensure that counter blocks are unique, an incrementing function generates new counter blocks from an initial counter block to ensure that they do not repeat within a single message.
+Also, the starting counter blocks must be chosen to ensure uniqueness across all messages encrypted with the same key.
+The standard incremening function works by taking an initial counter block, the next counter blocks are created by applying an incremening function, this function can work on the entire block or just part of it.
+For example, if you have a block of 8 bits and you want to increment the last 5 bits, you treat those bits as a number and add 1, wrapping around if necessary.
+example: with a block like "***11110" , applying the incremening function four times would give you a sequence of blocks that changes the last 5 bits.
+As long as the number of blocks in a message is less then or equal to 2m, where m is the number of bits being incremented, the counter blocks will be unique within that message.
+One Way to ensure unique counter blocks is to encrypt messages sequentially. The initial counter block for the first message can be any string of bits, for subsequent messages, apply the incrementing function to the last counter block of the previous message, this message requires keeping track of the last counter block used.
+Another method is to assign a unique identifier(Nonce), to each message. The *Nonce* is included in every counter block, and the incrementing function is applied to the remaining bits.
+In *CTR* Mode, each counter block must  be unique to ensure security.
+
+### Generation of Initialization Vectors
+
+An Initialization Vector(IV) is needed for encryption modes like CBC, CFB, and OFB along the plaintext. Each encryption requires a unique IV, which must also be used for decryption.
+The IV does not need to be kept secret and can be sent with the ciphertext.
+For CBC and CFB modes, IVs must be unpredictable, in OFB mode, the IV must be unique but does not have to be unpredictable.
+There are 2 main methods of generating AVs:
+1 is to use a Nonce and apply the encryption function to it with the same key, method 2 is to create a random data block using a FIPS-approved random number generator.
+Using the same IV for multiple messages in OFB mode can compromise security. If an attacker knows the plaintext block, they can recover corresponding plaintext from other messages encrypted with the same IV.
+To ensure security, implementation of CBC, CFB and OFB modes should be checked to confirm that they generate IVs that are unique and unpredictable.
+
+### Error Properties
+If there is a bit error in a ciphertext block, the decrypted output will be incorrect.
+In CFB, OFB and CTR modes, the bit errors appear in the same positions in the decrypted block as in the ciphertext.
+In ECB and CBC modes, bit errors can occur in any position of the decrypted block, with about 50% of chance of error.
+In ECB mode, errors in one block do not affect others.
+in CBC mode, error in one block affect the next block's decryption, errors in the IV affect lead to incorrect decryption of the first block, with errors in the same positions as in the IV.
+in CFB mode, errors in a segment affect the next few segments, errors in the IV affect the first segment and possibly subsequent segments.
+in OFB mode, errors in one block affect all subsequent blocks, errors in the IV affect all ciphertext blocks.
+in CTR mode, errors in a counter block can lead to random errors in the corresponding ciphertext.
+
+The CBC mode is particularly vulnerable to intentional bit errors in the IV, which can affect the first ciphertext block.
+OFB and CTR modes are vulnerable to errors in their ciphertext blocks if the integrity of those blocks is not protected.
+Inserting or deleting bits disrupts the synchronization of blocks, leading to errors in subsequent blocks.
+in 1-bit CBF mode, synchronization is restored automatically after a few bits, but for other modes, it must be fixed externally.
