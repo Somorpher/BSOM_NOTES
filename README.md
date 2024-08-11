@@ -179,7 +179,7 @@ For each counter(T1, T2, ..., Tn), it applies the encryption function to generat
 To generate ciphertext, it XORes each output block with the corresponding plaintext block to create the ciphertext blocks.
 For the last block, if it's a partial block, only the most significant bits are used for XOR operation, and the rest are discarded.
 
-** CTR Decryption**
+**CTR Decryption**
 Like encryption, it applies encryption function to each counter to generate the output blocks.
 To recover plaintext, it XORes each output block with the corresponding ciphertext block to recover the plaintext blocks.
 For the last block, uses the most significat bits of the output block for the XOR operation, discarding the rest.
