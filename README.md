@@ -138,11 +138,11 @@ This process continues for all blocks, to recover any plaintext block(except the
 The *IV* can also not be secret, but should be unpredictable.
 *CBF* Mode uses a parameter called s, which determines the size of the segmens(in bits) for both plaintext and ciphertext(e.g: 1-bit, 8-bit or 64-bit CFB Mode).
 
-** CFB Encryption**
+**CFB Encryption**
 For encryption, the first input block is the *IV*. It applies the encryption function to the IV to get the first output block. The first ciphertext segment is created by XORing the first plaintext segment with the most significant bits of the output block, the remaining bits of the output block are discarded. For the next input blocks, like the second input block, it takes the least significant bits of the IV and combine them with the first ciphertext segment.
 This process continues, each new input block is formed by combining the previous ciphertext segment with the least significant bits of the previous input block. This process is repeated for all plaintext segments, using output from the previous step to create the next input block.
 
-** CFB Decryption**
+**CFB Decryption**
 For decryption, the first input block is the *IV*, it applies the encryption function to the IV to get the output block. To recover the first plaintext segment, it XORes the most significant bits of the output block with the first ciphertext segment. For subsequent plaintext segments, it continues to use the previous ciphertext segments in the same way.
 In *CBF* enecryption, you cannot process multiple blocks in parallel because each block depends on the previous one.
 In *CBC* decryption, you can process multiple blocks in parallel once the input blocks are constructed from the IV and ciphertext.
@@ -162,7 +162,7 @@ For next output block(O2), it uses the previous output block (O1) as input to th
 This process is repeated for all plaintext blocks, using the previous output block to generate the next one.
 The Last block, if a partial block, only the most significant bits are used for the XOR operation, and the rest are discarder.
 
-** OFB Decryption **
+**OFB Decryption**
 For the first output block, it starts with the *IV* and generate the first output block(O1), XOR the output with the first ciphertext block(C1) to recover the first plaintext block(P1).
 For subsequent output blocks, it uses the previous output block to generate the next output block(O2) and XOR it with the second ciphertext block(C2) to recover the second plaintext block(P2).
 For the Last block, it uses the most significant bits of the last output block for the XOR operation, and discard the rest.
@@ -174,7 +174,7 @@ It is recommended to use a unique IV for every message. If the same IV is used f
 *CTR* Mode encrypts data with a series of unique input blocks called counters. These counter are processed to create output blocks, which are then combined with a plaintext to produce ciphertext.
 Each counter in the sequence must be different from all the others, not just within a single message, but across all messages encrypted with the same key, this ensures that the encryption remains secure.
 
-** CTR Encryption**
+**CTR Encryption**
 For each counter(T1, T2, ..., Tn), it applies the encryption function to generate output blocks(O1, O2...).
 To generate ciphertext, it XORes each output block with the corresponding plaintext block to create the ciphertext blocks.
 For the last block, if it's a partial block, only the most significant bits are used for XOR operation, and the rest are discarded.
