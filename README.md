@@ -7,6 +7,8 @@ this will cover five confidentiality modes to use with symmetric key block ciphe
 * CFB(Cipher Feedback)
 * OFB(Output Feedback)
 * CTR(Counter)
+* GCM(Galois-Counter Mode)
+* EAX
 
 ### Definitions, abbreviations, and symbols
 
@@ -247,3 +249,45 @@ The CBC mode is particularly vulnerable to intentional bit errors in the IV, whi
 OFB and CTR modes are vulnerable to errors in their ciphertext blocks if the integrity of those blocks is not protected.
 Inserting or deleting bits disrupts the synchronization of blocks, leading to errors in subsequent blocks.
 in 1-bit CBF mode, synchronization is restored automatically after a few bits, but for other modes, it must be fixed externally.
+
+### GCM(Galois-Counter Mode)
+*GCM* is an authenticated encryption mode that provides both confidentiality and integrity. It combines the Counter(CTR) mode with a Galois field multiplication for authentication. *GCM* is efficient and allows for parallel processing.
+
+**GCM Encryption**
+
+GCM requires a nonce(unique value for each encryption) and a secret key.
+A counter is initialized and incremented for each block of plaintext.
+Each plaintext block is XORed with the output of the encryption of the counter value using the secret key.
+An Authentication Tag is generated using the Galois field multiplication of the encrypted data and additional authenticated data(AAD).
+The final authentication Tag(T) is computed based on the ciphertext and AAD.
+
+**GCM Decryption**
+
+`Counter Generation` --> `Decryption` --> `Tag Verification`.
+
+The same counter values used during encryption are generated.
+Each ciphertext block is XORed with the output of the encryption of the counter value to recover the plaintext.
+The authentication tag is verified to ensure data integrity.
+*GCM* allows for parallel encryption and decryption.
+
+### EAX Mode
+
+*EAX* mode is another authenticated encryption mode that combines Counter(CTR) with MAC(Message Authentication Code) for integrity. Is Designed to be simple and efficient while providing both confidentiality and integrity.
+
+**Eax Encryption**
+
+*EAX* requires a nonce and a secret key.
+A counter is initialized and incremented for each block of plaintext.
+Each Plaintext block encrypted is encrypted using **CTR** mode.
+A MAC(Message Authentication Code) is generated for both the plaintext and any additional authenticated data(AAD) to ensure integrity.
+
+**EAX Decryption**
+
+The same counter values used during encryption are generated.
+Each ciphertext block is decrypted using CTR Mode.
+The MAC is verified to ensure data integrity.
+*EAX* mode allows for parallel processing.
+
+So...
+*GCM* combines CTR mode for encryption with Galois field multiplication for authentication. Allows for parallel processing.
+*EAX* combines CTR mode for encryption with a MAC for integrity. Allows for parallel processing.
