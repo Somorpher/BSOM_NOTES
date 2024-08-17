@@ -1,6 +1,6 @@
 # BSOM_NOTES
 
-this will cover five confidentiality modes to use with symmetric key block cipher algorithm.
+this will cover some confidentiality modes to use with symmetric key block cipher algorithm.
 
 * ECB(Electronic Codeblock)
 * CBC(Cipher Block Chaining)
